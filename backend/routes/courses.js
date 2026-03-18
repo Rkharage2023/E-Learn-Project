@@ -2,11 +2,10 @@ const express = require("express");
 const pool = require("../db/pool");
 const { authUser, roleAuthorization } = require("../utils/auth");
 const result = require("../utils/createResult");
-const API_URL = process.env.REACT_APP_API_URL;
 
 const router = express.Router();
 
-router.get(`${API_URL}/all-active-courses`, (req, res) => {
+router.get("/all-active-courses", (req, res) => {
   const sql =
     "SELECT * FROM courses WHERE CURDATE() BETWEEN start_date AND end_date";
   pool.query(sql, (error, data) => {
@@ -14,7 +13,7 @@ router.get(`${API_URL}/all-active-courses`, (req, res) => {
   });
 });
 
-router.get(`${API_URL}/all-courses`, (req, res) => {
+router.get("/all-courses", (req, res) => {
   const { startDate, endDate } = req.query;
 
   let sql = "SELECT * FROM courses";
@@ -30,7 +29,7 @@ router.get(`${API_URL}/all-courses`, (req, res) => {
   });
 });
 
-router.post(`${API_URL}/add`, roleAuthorization, (req, res) => {
+router.post("/add", roleAuthorization, (req, res) => {
   const {
     course_name,
     description,
@@ -50,7 +49,7 @@ router.post(`${API_URL}/add`, roleAuthorization, (req, res) => {
   );
 });
 
-router.put(`${API_URL}/update/:course_id`, roleAuthorization, (req, res) => {
+router.put("/update/:course_id", roleAuthorization, (req, res) => {
   const { course_id } = req.params;
   const {
     course_name,
@@ -84,7 +83,7 @@ router.put(`${API_URL}/update/:course_id`, roleAuthorization, (req, res) => {
   );
 });
 
-router.delete(`${API_URL}/delete/:course_id`, roleAuthorization, (req, res) => {
+router.delete("/delete/:course_id", roleAuthorization, (req, res) => {
   const { course_id } = req.params;
 
   const sql = "DELETE FROM courses WHERE course_id = ?";

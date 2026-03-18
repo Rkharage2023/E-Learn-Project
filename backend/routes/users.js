@@ -6,11 +6,10 @@ const { roleAuthorization } = require("../utils/auth");
 const cryptojs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
-const API_URL = process.env.REACT_APP_API_URL;
 
 const router = express.Router();
 
-router.post(`${API_URL}/signup`, (req, res) => {
+router.post("/signup", (req, res) => {
   const { email, password } = req.body;
   const sql = "insert into users( email, password) values(?,?)";
   const hashedPassword = cryptojs.SHA256(password).toString();
@@ -19,7 +18,7 @@ router.post(`${API_URL}/signup`, (req, res) => {
   });
 });
 
-router.post(`${API_URL}/signin`, (req, res) => {
+router.post("/signin", (req, res) => {
   const { email, password } = req.body;
   const hashedPassword = cryptojs.SHA256(password).toString();
   const sql = "select * from users where email = ? and password = ?";
@@ -44,7 +43,7 @@ router.post(`${API_URL}/signin`, (req, res) => {
   });
 });
 
-router.get("${API_URL}/", (req, res) => {
+router.get("/", (req, res) => {
   const email = req.headers.email;
   const sql = "select * from users where email = ?";
   pool.query(sql, [email], (error, data) => {
@@ -52,7 +51,7 @@ router.get("${API_URL}/", (req, res) => {
   });
 });
 
-router.get(`${API_URL}/all-studs`, roleAuthorization, (req, res) => {
+router.get("/all-studs", roleAuthorization, (req, res) => {
   const email = req.headers.email;
   const sql = "select * from users";
   pool.query(sql, [email], (error, data) => {
@@ -60,7 +59,7 @@ router.get(`${API_URL}/all-studs`, roleAuthorization, (req, res) => {
   });
 });
 
-router.delete(`${API_URL}/`, (req, res) => {
+router.delete("/", (req, res) => {
   const email = req.headers.email;
   const sql = "delete from users where email = ?";
   pool.query(sql, [email], (error, data) => {
@@ -68,7 +67,7 @@ router.delete(`${API_URL}/`, (req, res) => {
   });
 });
 
-router.get(`${API_URL}/profile`, (req, res) => {
+router.get("/profile", (req, res) => {
   const email = req.headers.email;
   const sql = `
     SELECT u.name, u.email, u.mobile, 
@@ -93,7 +92,7 @@ router.get(`${API_URL}/profile`, (req, res) => {
   });
 });
 
-router.post(`${API_URL}/change-password`, (req, res) => {
+router.post("/change-password", (req, res) => {
   const email = req.headers.email;   // SAME AS YOUR CODE
   const { newPassword } = req.body;
 

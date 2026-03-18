@@ -3,9 +3,9 @@ const { roleAuthorization } = require("../utils/auth");
 const pool = require("../db/pool");
 const result = require("../utils/createResult");
 const router = express.Router();
+const API_URL = process.env.REACT_APP_API_URL;
 
-
-router.get("/enrolledstudents", roleAuthorization, (req, res) => {
+router.get(`${API_URL}/enrolledstudents`, roleAuthorization, (req, res) => {
   const { course_id } = req.query;
 
   let sql = `

@@ -2,16 +2,17 @@ const jwt = require("jsonwebtoken");
 
 const result = require("./createResult");
 const config = require("../utils/config");
+const API_URL = process.env.REACT_APP_API_URL;
 
 function authUser(req, res, next) {
   const path = req.url;
   console.log(path);
   if (
-    path == "/users/signin" ||
-    path == "/users/signup" ||
-    path == "/courses/all-courses" ||
-    path == "/courses/all-active-courses" ||
-    path == "/students/register-to-course"
+    path == `${API_URL}/users/signin` ||
+    path == `${API_URL}/users/signup` ||
+    path == `${API_URL}/courses/all-courses` ||
+    path == `${API_URL}/courses/all-active-courses` ||
+    path == `${API_URL}/students/register-to-course`
   ) {
     next();
   } else {

@@ -3,6 +3,7 @@ const express = require("express");
 const pool = require("../db/pool");
 const result = require("../utils/createResult");
 const cryptojs = require("crypto-js");
+const API_URL = process.env.REACT_APP_API_URL;
 
 const router = express.Router();
 
@@ -41,7 +42,7 @@ const router = express.Router();
 //   });
 // });
 
-router.post("/register-to-course", (req, res) => {
+router.post(`${API_URL}/register-to-course`, (req, res) => {
   const { name, email, course_id, mobile_no } = req.body;
 
   const checkStudentSql =
@@ -94,7 +95,7 @@ router.post("/register-to-course", (req, res) => {
   });
 });
 
-router.put("/change-password", (req, res) => {
+router.put(`${API_URL}/change-password`, (req, res) => {
   const email = req.headers.email;
   const { newPassword, confirmPassword } = req.body;
   if (newPassword == confirmPassword) {
@@ -122,7 +123,7 @@ router.put("/change-password", (req, res) => {
 //   });
 // });
 
-router.get("/my-courses/:email", (req, res) => {
+router.get(`${API_URL}/my-courses/:email`, (req, res) => {
   const { email } = req.params;
 
   const sql = `
@@ -141,7 +142,7 @@ router.get("/my-courses/:email", (req, res) => {
   });
 });
 
-router.get("/my-course-with-videos", (req, res) => {
+router.get(`${API_URL}/my-course-with-videos`, (req, res) => {
   const email = req.headers.email;
   if (!email) {
     return res.send(result.createResult("Unauthorized"));

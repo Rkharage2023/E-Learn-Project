@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: "https://your-app.vercel.app",
+    origin: "https://e-learn-project-ten.vercel.app/",
     credentials: true,
   }),
 );

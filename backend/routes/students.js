@@ -41,16 +41,14 @@ const router = express.Router();
 //   });
 // });
 
+// routes/students.js
 router.post("/register-to-course", (req, res) => {
   const { name, email, course_id, mobile_no } = req.body;
 
-  const checkStudentSql =
-    "SELECT * FROM students WHERE email = ? AND course_id = ?";
-
-  pool.query(checkStudentSql, [email, course_id], (err, rows) => {
-    if (err) {
-      return res.send({ status: "error", error: err });
-    }
+  // Step 1: Check if already enrolled
+  const checkEnrollSql = "SELECT * FROM students WHERE email = ? AND course_id = ?";
+  pool.query(checkEnrollSql, [email, course_id], (err, rows) => {
+    if (err) return res.send({ status: "error", error: err });
 
     if (rows.length > 0) {
       return res.send({
@@ -59,40 +57,38 @@ router.post("/register-to-course", (req, res) => {
       });
     }
 
-    const sql1 = "select * from users where email = ?";
-    pool.query(sql1, [email], (error, data) => {
-      if (data.length == 0) {
-        const sql2 = "insert into users(email,password) values (?, ?)";
-        const password = "student";
-        const hashedPassword = cryptojs.SHA256(password).toString();
+    // Step 2: Check if user account exists
+    const checkUserSql = "SELECT * FROM users WHERE email = ?";
+    pool.query(checkUserSql, [email], (err, users) => {
+      if (err) return res.send({ status: "error", error: err });
 
-        pool.query(sql2, [email, hashedPassword], (error, data) => {
-          if (error) {
-            return res.status(401).send({ msg: error });
-          }
-        });
+      if (users.length === 0) {
+        // Step 3a: Create user account first, THEN enroll
+        const createUserSql = "INSERT INTO users(email, password) VALUES (?, ?)";
+        const hashedPassword = cryptojs.SHA256("student").toString();
 
-        const sql =
-          "insert into students(name,email,course_id,mobile_no) values(?,?,?,?)";
-        pool.query(sql, [name, email, course_id, mobile_no], (error, data) => {
-          return res.send(result.createResult(error, data));
+        pool.query(createUserSql, [email, hashedPassword], (err) => {
+          if (err) return res.status(401).send({ status: "error", error: err });
+
+          // ✅ Only enroll AFTER user is created (no race condition)
+          enrollStudent(name, email, course_id, mobile_no, res);
         });
       } else {
-        const sql =
-          "insert into students(name,email,course_id,mobile_no) values(?,?,?,?)";
-        pool.query(sql, [name, email, course_id, mobile_no], (error, data) => {
-          if (error) {
-            return res.send({ error: error });
-          }
-          return res.send({
-            status: "success",
-            data: data,
-          });
-        });
+        // Step 3b: User exists, just enroll
+        enrollStudent(name, email, course_id, mobile_no, res);
       }
     });
   });
 });
+
+// ✅ Extracted helper to avoid duplication
+function enrollStudent(name, email, course_id, mobile_no, res) {
+  const sql = "INSERT INTO students(name, email, course_id, mobile_no) VALUES (?, ?, ?, ?)";
+  pool.query(sql, [name, email, course_id, mobile_no], (err, data) => {
+    if (err) return res.send({ status: "error", error: err });
+    return res.send({ status: "success", data });
+  });
+}
 
 router.put("/change-password", (req, res) => {
   const email = req.headers.email;

@@ -1,6 +1,7 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { getProfile } from "../services/userService";
+import { toast } from "react-toastify"; // ✅ was missing
 
 function Profile() {
   const [email, setEmail] = useState("");

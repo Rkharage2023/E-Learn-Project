@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AdminNavbar from "../components/AdminNavbar";
-import { getCourses } from "../services/userService";
+import { getAllCourses } from "../services/courseService";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +14,7 @@ function AddVideo() {
 
   const getAllCourses = async () => {
     const token = sessionStorage.getItem("token");
-    const result = await getCourses(token);
+    const result = await getAllCourses(token);
 
     if (result.status === "Success") {
       setCourse(result.data);

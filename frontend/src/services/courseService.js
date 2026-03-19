@@ -2,79 +2,64 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// ✅ GET ALL ACTIVE COURSES
-export async function getAllCourses() {
-  const token = sessionStorage.getItem("token"); // ✅ added
+// courseService.js
 
+// ✅ For PUBLIC users — only active courses
+export async function getActiveCourses() {
   const URL = `${API_URL}/courses/all-active-courses`;
-
-  const res = await axios.get(URL, {
-    headers: {
-      token: token,
-    },
-  });
-
+  const res = await axios.get(URL);
   return res.data;
 }
 
-// ✅ MY COURSES
+// ✅ For ADMIN — all courses regardless of date
+export async function getAllCourses() {
+  const token = sessionStorage.getItem("token");
+  const URL = `${API_URL}/courses/all-courses`;
+  const res = await axios.get(URL, {
+    headers: { token },
+  });
+  return res.data;
+}
+
+// ✅ MY COURSES (unchanged)
 export async function mycourses(email) {
-  const URL = `${API_URL}/students/my-courses/${email}`; // ✅ added
-
   const token = sessionStorage.getItem("token");
+  const URL = `${API_URL}/students/my-courses/${email}`;
 
   const res = await axios.get(URL, {
-    headers: {
-      token: token,
-    },
+    headers: { token },
   });
 
   return res.data;
 }
 
-// ✅ REGISTER COURSE
+// ✅ REGISTER COURSE (unchanged)
 export async function registerCourseService(data) {
-  const URL = `${API_URL}/students/register-to-course`; // ✅ added
-
   const token = sessionStorage.getItem("token");
-
+  const URL = `${API_URL}/students/register-to-course`;
   const res = await axios.post(URL, data, {
-    headers: {
-      token: token,
-    },
+    headers: { token },
   });
-
   return res.data;
 }
 
-// ✅ MY COURSE VIDEOS
+// ✅ MY COURSE VIDEOS (unchanged)
 export async function myCourseVideos() {
-  const URL = `${API_URL}/students/my-course-with-videos`; // ✅ added
-
   const email = sessionStorage.getItem("email");
   const token = sessionStorage.getItem("token");
-
+  const URL = `${API_URL}/students/my-course-with-videos`;
   const res = await axios.get(URL, {
-    headers: {
-      email: email,
-      token: token,
-    },
+    headers: { email, token },
   });
-
   return res.data;
 }
 
-// ✅ UPDATE COURSE
+// ✅ UPDATE COURSE (unchanged)
 export async function updateCourse(course_id, courseData) {
-  const URL = `${API_URL}/courses/update/${course_id}`; // ✅ added
-
   const token = sessionStorage.getItem("token");
-
+  const URL = `${API_URL}/courses/update/${course_id}`;
   const res = await axios.put(URL, courseData, {
-    headers: {
-      token: token,
-    },
+    headers: { token },
   });
-
   return res.data;
 }

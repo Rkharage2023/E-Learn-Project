@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { getCourses } from "../services/userService";
+import { getActiveCourses } from "../services/courseService";
 
 function Courses() {
   const [course, setCourse] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAllCourses();
+    getAllActiveCourses();
   }, []);
 
-  const getAllCourses = async () => {
-    const result = await getCourses();
+  const getAllActiveCourses = async () => {
+    const result = await getActiveCourses();
 
     if (result.status === "Success") {
       setCourse(result.data);

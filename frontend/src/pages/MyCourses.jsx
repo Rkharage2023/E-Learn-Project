@@ -19,16 +19,19 @@ function MyCourses() {
 
     if (!email || !token) {
       toast.error("Please login to view your courses");
-      navigate("/");
+      navigate("/login");
       return;
     }
 
     try {
-      const result = await mycourses(email, token);
+      const result = await mycourses(email);
       console.log("MY COURSES RESULT:", result);
 
-      if (result.status === "success") {
+      if (result.status === "Success") {
+        // ✅ capital S
         setCourses(result.data);
+      } else {
+        toast.error("Failed to load courses");
       }
     } catch (err) {
       console.log("ERROR:", err);

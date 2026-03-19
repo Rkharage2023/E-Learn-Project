@@ -14,16 +14,15 @@ const PORT = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: "https://e-learn-project-ten.vercel.app/",
+    origin: "https://e-learn-project-ten.vercel.app", // ✅ no trailing slash
     credentials: true,
   }),
 );
 
 app.use(express.json());
 // app.use(authUser);
-// Routes
-app.use("/courses", coursesRouter);
-app.use("/users", userRouter);
+app.use("/courses", coursesRouter); // public routes handle their own auth via roleAuthorization
+app.use("/users", authUser, userRouter); // ✅ protect user routes
 app.use("/students", authUser, studentRouter);
 app.use("/admin", authUser, adminRouter);
 app.use("/video", authUser, videosRouter);

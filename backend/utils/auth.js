@@ -1,47 +1,48 @@
+// utils/auth.js
 const jwt = require("jsonwebtoken");
-
 const result = require("./createResult");
-const config = require("../utils/config");
+const config = require("./config");
+
+// ✅ Routes that don't need a token — matched by [method, path substring]
+const PUBLIC_ROUTES = [
+  { method: "POST", path: "/signin" },
+  { method: "POST", path: "/signup" },
+  { method: "GET", path: "/all-courses" },
+  { method: "GET", path: "/all-active-courses" },
+  { method: "POST", path: "/register-to-course" },
+];
 
 function authUser(req, res, next) {
-  const path = req.url;
-  console.log(path);
-  if (
-    path == "/users/signin" ||
-    path == "/users/signup" ||
-    path == "/courses/all-courses" ||
-    path == "/courses/all-active-courses" ||
-    path == "/students/register-to-course"
-  ) {
-    next();
-  } else {
-    const token = req.headers.token;
-    if (!token) {
-      res.send(result.createResult(`Token Is Missing`));
-    } else {
-      try {
-        const payload = jwt.verify(token, config.SECRET);
-        req.headers.uid = payload.uid;
-        req.headers.email = payload.email;
-        req.headers.role = payload.role;
+  const isPublic = PUBLIC_ROUTES.some(
+    (r) => r.method === req.method && req.path.startsWith(r.path),
+  );
 
-        next();
-      } catch (ex) {
-        res.send(result.createResult(`Token Is Invalid`));
-      }
-    }
+  if (isPublic) return next();
+
+  const token = req.headers.token;
+
+  if (!token) {
+    return res.send(result.createResult("Token Is Missing"));
+  }
+
+  try {
+    const payload = jwt.verify(token, config.SECRET);
+    req.headers.uid = payload.uid;
+    req.headers.email = payload.email;
+    req.headers.role = payload.role;
+    next();
+  } catch {
+    res.send(result.createResult("Token Is Invalid"));
   }
 }
 
 function roleAuthorization(req, res, next) {
   const role = req.headers.role;
   if (role === "admin") {
-    console.log(`welcome admin`);
     return next();
-  } else {
-    console.log(`Not Authorized`);
-    res.send(`Not Authorized`);
   }
+  // ✅ Return proper JSON instead of plain text
+  return res.status(403).send(result.createResult("Not Authorized"));
 }
 
 module.exports = { authUser, roleAuthorization };

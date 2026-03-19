@@ -87,11 +87,10 @@ export async function getAllVideos() {
 // ✅ GET ALL COURSES
 export async function getAllCourses() {
   const token = sessionStorage.getItem("token");
-
-  const URL = `${API_URL}/courses/all`; // ✅ added
+  const URL = `${API_URL}/courses/all-courses`;
 
   const response = await axios.get(URL, {
-    headers: { token }, // (kept your logic)
+    headers: { token },
   });
 
   return response.data;

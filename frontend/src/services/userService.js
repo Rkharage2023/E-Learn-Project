@@ -22,9 +22,8 @@ export async function registerUser(name, email, password, mobile) {
 
 // ✅ GET COURSES
 export async function getCourses(token) {
-  const URL = `${API_URL}/courses/all-active-courses`; // ✅ added
-
-  const headers = { token };
+  const URL = `${API_URL}/courses/all-active-courses`;
+  const headers = token ? { token } : {};
   const response = await axios.get(URL, { headers });
   return response.data;
 }

@@ -14,7 +14,11 @@ const PORT = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: "https://e-learn-project-ten.vercel.app", // ✅ no trailing slash
+    origin: [
+      "https://e-learn-project-ten.vercel.app",
+      "https://e-learn-project-nzokdhodi-rkharage2023s-projects.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
   }),
 );

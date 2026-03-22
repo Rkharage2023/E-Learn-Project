@@ -14,16 +14,28 @@ const PORT = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: [
-      "https://e-learn-project-ten.vercel.app",
-      "https://e-learn-project-nzokdhodi-rkharage2023s-projects.vercel.app",
-      "https://e-learn-project.vercel.app",
-      "http://localhost:3000",
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, mobile apps)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "https://e-learn-project-ten.vercel.app",
+      ];
+
+      // ✅ Allow ANY vercel.app subdomain for your project
+      const isVercel = origin.endsWith(".vercel.app");
+
+      if (allowedOrigins.includes(origin) || isVercel) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "token", "email", "role"],
-  })
+  }),
 );
 
 app.use(express.json());

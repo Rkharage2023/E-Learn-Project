@@ -17,10 +17,13 @@ app.use(
     origin: [
       "https://e-learn-project-ten.vercel.app",
       "https://e-learn-project-nzokdhodi-rkharage2023s-projects.vercel.app",
+      "https://e-learn-project.vercel.app",
       "http://localhost:3000",
     ],
     credentials: true,
-  }),
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "token", "email", "role"],
+  })
 );
 
 app.use(express.json());

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = "https://e-learn-project.onrender.com";
 
 // ✅ LOGIN
 export async function loginUser(email, password) {

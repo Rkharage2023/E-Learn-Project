@@ -13,30 +13,26 @@ function Login() {
   const { setLoginStatus } = useContext(LoginContext);
   const { login: authLogin } = useAuth();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleLogin = async () => {
-    if (!email) {
-      toast.warn("Email must be entered");
-      return;
-    }
-    if (!password) {
-      toast.warn("Password must be entered");
-      return;
-    }
+    if (!email) return toast.warn("Email must be entered");
+    if (!password) return toast.warn("Password must be entered");
+
+    setIsLoading(true); // ✅ show loading
+    toast.info("Connecting to server, please wait..."); // ✅ warn user
 
     const result = await authLogin(email, password);
+    setIsLoading(false);
 
     if (result.success) {
-      // Get token from sessionStorage (already saved by authLogin)
       const token = sessionStorage.getItem("token");
       if (!token) {
         toast.error("Login failed: no token returned");
         return;
       }
-
-      // Decode token to get email and role
       const payload = JSON.parse(atob(token.split(".")[1]));
       sessionStorage.setItem("email", payload.email);
-
       setLoginStatus(true);
       toast.success("Login successful");
 
@@ -49,7 +45,6 @@ function Login() {
       toast.error(result.error || "Login failed");
     }
   };
-
   return (
     <div className="login-container">
       {/* Left illustration */}
@@ -91,8 +86,13 @@ function Login() {
             />
           </div>
 
-          <button className="login-button" type="button" onClick={handleLogin}>
-            Sign In
+          <button
+            className="login-button"
+            type="button"
+            onClick={handleLogin}
+            disabled={isLoading} // ✅ disable while loading
+          >
+            {isLoading ? "Connecting..." : "Sign In"} // ✅ show loading text
           </button>
         </div>
       </div>

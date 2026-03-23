@@ -26,7 +26,6 @@ import ChangePassword from "./components/ChangePassword";
 import UpdateCourse from "./pages/UpdateCourse";
 
 export const LoginContext = createContext();
-
 // ✅ Helper to check if token in sessionStorage is valid (not expired)
 function isTokenValid() {
   try {
@@ -54,6 +53,33 @@ function getRoleFromToken() {
   } catch {
     return null;
   }
+}
+
+function ProtectedRoute({ element, adminOnly = false }) {
+  const valid = isTokenValid();
+  const role = getRoleFromToken();
+
+  // ✅ Debug
+  console.log(
+    "ProtectedRoute - valid:",
+    valid,
+    "role:",
+    role,
+    "adminOnly:",
+    adminOnly,
+  );
+
+  if (!valid) {
+    console.log("Not valid - redirecting to login");
+    return <Navigate to="/login" />;
+  }
+
+  if (adminOnly && role !== "admin") {
+    console.log("Not admin - redirecting to home");
+    return <Navigate to="/home" />;
+  }
+
+  return element;
 }
 
 function App() {

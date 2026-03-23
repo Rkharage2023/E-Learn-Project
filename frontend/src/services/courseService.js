@@ -22,13 +22,20 @@ export async function getAllCourses() {
 }
 
 // ✅ MY COURSES (unchanged)
+// ✅ mycourses in courseService.js
 export async function mycourses(email) {
   const token = sessionStorage.getItem("token");
-  const URL = `${API_URL}/students/my-courses/${email}`;
 
-  const res = await axios.get(URL, {
-    headers: { token },
-  });
+  console.log("Calling mycourses with email:", email); // ✅ debug
+
+  const res = await axios.get(
+    `https://e-learn-project.onrender.com/students/my-courses/${email}`,
+    {
+      headers: { token },
+    },
+  );
+
+  console.log("mycourses response:", res.data); // ✅ debug
 
   return res.data;
 }

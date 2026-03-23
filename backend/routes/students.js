@@ -46,7 +46,8 @@ router.post("/register-to-course", (req, res) => {
   const { name, email, course_id, mobile_no } = req.body;
 
   // Step 1: Check if already enrolled
-  const checkEnrollSql = "SELECT * FROM students WHERE email = ? AND course_id = ?";
+  const checkEnrollSql =
+    "SELECT * FROM students WHERE email = ? AND course_id = ?";
   pool.query(checkEnrollSql, [email, course_id], (err, rows) => {
     if (err) return res.send({ status: "error", error: err });
 
@@ -64,7 +65,8 @@ router.post("/register-to-course", (req, res) => {
 
       if (users.length === 0) {
         // Step 3a: Create user account first, THEN enroll
-        const createUserSql = "INSERT INTO users(email, password) VALUES (?, ?)";
+        const createUserSql =
+          "INSERT INTO users(email, password) VALUES (?, ?)";
         const hashedPassword = cryptojs.SHA256("student").toString();
 
         pool.query(createUserSql, [email, hashedPassword], (err) => {
@@ -83,7 +85,8 @@ router.post("/register-to-course", (req, res) => {
 
 // ✅ Extracted helper to avoid duplication
 function enrollStudent(name, email, course_id, mobile_no, res) {
-  const sql = "INSERT INTO students(name, email, course_id, mobile_no) VALUES (?, ?, ?, ?)";
+  const sql =
+    "INSERT INTO students(name, email, course_id, mobile_no) VALUES (?, ?, ?, ?)";
   pool.query(sql, [name, email, course_id, mobile_no], (err, data) => {
     if (err) return res.send({ status: "error", error: err });
     return res.send({ status: "success", data });
@@ -118,11 +121,22 @@ router.put("/change-password", (req, res) => {
 //   });
 // });
 
+// routes/students.js
 router.get("/my-courses/:email", (req, res) => {
   const { email } = req.params;
 
+  console.log("my-courses called for email:", email); // ✅ debug
+
+  if (!email) {
+    return res.send({ status: "error", error: "Email is required" });
+  }
+
   const sql = `
-    SELECT DISTINCT c.course_id, c.course_name, c.description, c.fees
+    SELECT DISTINCT 
+      c.course_id, 
+      c.course_name, 
+      c.description, 
+      c.fees
     FROM courses c
     JOIN students s ON c.course_id = s.course_id
     WHERE s.email = ?
@@ -130,13 +144,16 @@ router.get("/my-courses/:email", (req, res) => {
 
   pool.query(sql, [email], (err, data) => {
     if (err) {
-      res.send({ status: "error", error: err });
-    } else {
-      res.send({ status: "success", data });
+      console.log("DB error:", err); // ✅ debug
+      return res.send({ status: "error", error: err.message });
     }
+
+    console.log("my-courses result:", data); // ✅ debug
+
+    // ✅ Always return success even if empty array
+    return res.send({ status: "success", data: data });
   });
 });
-
 router.get("/my-course-with-videos", (req, res) => {
   const email = req.headers.email;
   if (!email) {

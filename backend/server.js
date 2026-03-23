@@ -49,3 +49,8 @@ app.use("/video", authUser, videosRouter);
 app.listen(PORT, () => {
   console.log(`Server Started At Port ${PORT}`);
 });
+
+// server.js - add this before other routes
+app.get("/health", (req, res) => {
+  res.send({ status: "ok", time: new Date() });
+});

@@ -59,7 +59,7 @@ function AddCourse() {
         fees,
         start_date,
         end_date,
-        video_expire_days
+        video_expire_days,
       );
 
       if (res.status === "Success") {
@@ -104,7 +104,7 @@ function AddCourse() {
           <div className="mb-3">
             <label className="form-label">Fees</label>
             <input
-              type="number"
+              type="tel"
               className="form-control"
               value={fees}
               onChange={(e) => setFees(e.target.value)}

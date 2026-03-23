@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import { mycourses } from "../services/courseService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "./MyCourses.css";
 
 function MyCourses() {
   const [courses, setCourses] = useState([]);
@@ -18,10 +19,6 @@ function MyCourses() {
     const email = sessionStorage.getItem("email");
     const token = sessionStorage.getItem("token");
 
-    // ✅ Debug - remove after fixing
-    console.log("email from session:", email);
-    console.log("token from session:", token);
-
     if (!email || !token) {
       toast.error("Please login first");
       navigate("/login");
@@ -31,22 +28,14 @@ function MyCourses() {
     try {
       const result = await mycourses(email);
 
-      // ✅ Debug - remove after fixing
-      console.log("API result:", result);
-
-      // ✅ Handle all possible status values
       if (result.status === "success" || result.status === "Success") {
         setCourses(result.data || []);
-      } else if (result.status === "error") {
-        console.log("API error:", result.error);
+      } else {
         setError("Failed to load courses");
         toast.error("Failed to load courses");
-      } else {
-        console.log("Unknown status:", result);
-        setError("Something went wrong");
       }
     } catch (err) {
-      console.log("Fetch error:", err);
+      console.error(err);
       setError("Failed to connect to server");
       toast.error("Failed to connect to server");
     } finally {
@@ -54,83 +43,138 @@ function MyCourses() {
     }
   };
 
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    loadMyCourses();
+  };
+
   return (
     <>
       <Navbar />
-      <div className="container mt-4">
-        <h3 className="mb-4">My Registered Courses</h3>
 
-        {/* ✅ Loading state */}
-        {loading && (
-          <div className="text-center mt-5">
-            <div className="spinner-border text-primary" role="status" />
-            <p className="mt-3 text-muted">Loading your courses...</p>
-          </div>
-        )}
-
-        {/* ✅ Error state */}
-        {!loading && error && (
-          <div className="text-center mt-5">
-            <p className="text-danger">{error}</p>
-            <button
-              className="btn btn-primary mt-2"
-              onClick={() => {
-                setLoading(true);
-                setError(null);
-                loadMyCourses();
-              }}
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* ✅ Empty state */}
-        {!loading && !error && courses.length === 0 && (
-          <div className="text-center mt-5">
-            <h5 className="text-muted">No courses registered yet</h5>
-            <p className="text-muted">
-              Browse our courses and register to get started
+      <div className="mc-page">
+        {/* ── HERO HEADER ── */}
+        <div className="mc-header">
+          <div className="mc-header-inner">
+            <p className="mc-header-eyebrow">Your Learning Journey</p>
+            <h1 className="mc-header-title">My Courses</h1>
+            <p className="mc-header-sub">
+              Pick up where you left off and keep growing.
             </p>
-            <button
-              className="btn btn-primary mt-2"
-              onClick={() => navigate("/courses")}
-            >
-              Browse Courses
-            </button>
           </div>
-        )}
+          {/* decorative blobs */}
+          <div className="mc-blob mc-blob-1" />
+          <div className="mc-blob mc-blob-2" />
+        </div>
 
-        {/* ✅ Courses list */}
-        {!loading && !error && courses.length > 0 && (
-          <div className="row g-4">
-            {courses.map((c) => (
-              <div key={c.course_id} className="col-md-4">
-                <div className="card shadow h-100">
-                  <div
-                    className="d-flex align-items-center justify-content-center bg-light"
-                    style={{ height: "160px", fontWeight: "600" }}
-                  >
-                    Course Image
-                  </div>
-                  <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">{c.course_name}</h5>
-                    <p className="text-muted flex-grow-1">{c.description}</p>
-                    <strong className="mb-3">₹ {c.fees}</strong>
-                    <button
-                      className="btn btn-primary btn-sm mt-auto"
-                      onClick={() =>
-                        navigate(`/my-course/${c.course_id}/videos`)
-                      }
-                    >
-                      View Videos
-                    </button>
-                  </div>
-                </div>
+        {/* ── CONTENT ── */}
+        <div className="mc-content">
+          {/* LOADING */}
+          {loading && (
+            <div className="mc-center">
+              <div className="mc-spinner">
+                <div className="mc-spinner-ring" />
               </div>
-            ))}
-          </div>
-        )}
+              <p className="mc-center-text">Loading your courses…</p>
+            </div>
+          )}
+
+          {/* ERROR */}
+          {!loading && error && (
+            <div className="mc-center">
+              <div className="mc-empty-icon">⚠️</div>
+              <h3 className="mc-center-title">Something went wrong</h3>
+              <p className="mc-center-text">{error}</p>
+              <button className="mc-btn-primary" onClick={handleRetry}>
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* EMPTY */}
+          {!loading && !error && courses.length === 0 && (
+            <div className="mc-center">
+              <div className="mc-empty-icon">📚</div>
+              <h3 className="mc-center-title">No courses yet</h3>
+              <p className="mc-center-text">
+                You haven't registered for any courses. Browse our catalog and
+                start learning today.
+              </p>
+              <button
+                className="mc-btn-primary"
+                onClick={() => navigate("/courses")}
+              >
+                Browse Courses
+              </button>
+            </div>
+          )}
+
+          {/* COURSES GRID */}
+          {!loading && !error && courses.length > 0 && (
+            <>
+              {/* Stats bar */}
+              <div className="mc-stats">
+                <div className="mc-stat">
+                  <span className="mc-stat-number">{courses.length}</span>
+                  <span className="mc-stat-label">
+                    {courses.length === 1 ? "Course" : "Courses"} Enrolled
+                  </span>
+                </div>
+                <button
+                  className="mc-btn-outline"
+                  onClick={() => navigate("/courses")}
+                >
+                  + Enroll in More
+                </button>
+              </div>
+
+              <div className="mc-grid">
+                {courses.map((c, index) => (
+                  <div
+                    className="mc-card"
+                    key={c.course_id}
+                    style={{ animationDelay: `${index * 0.08}s` }}
+                  >
+                    {/* Card top color band */}
+                    <div className="mc-card-band" />
+
+                    {/* Card image placeholder */}
+                    <div className="mc-card-thumb">
+                      <span className="mc-card-thumb-icon">🎓</span>
+                    </div>
+
+                    {/* Badge */}
+                    <div className="mc-card-body">
+                      <span className="mc-badge">Enrolled</span>
+
+                      <h3 className="mc-card-title">{c.course_name}</h3>
+
+                      <p className="mc-card-desc">
+                        {c.description?.length > 80
+                          ? c.description.slice(0, 80) + "…"
+                          : c.description}
+                      </p>
+
+                      {/* Footer */}
+                      <div className="mc-card-footer">
+                        <span className="mc-card-price">₹ {c.fees}</span>
+                        <button
+                          className="mc-btn-primary mc-btn-sm"
+                          onClick={() =>
+                            navigate(`/my-course/${c.course_id}/videos`)
+                          }
+                        >
+                          ▶ Watch Videos
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   );

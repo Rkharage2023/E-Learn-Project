@@ -41,9 +41,7 @@ export default function Navbar() {
 
           {/* CENTER - Search */}
           <div className="ud-search">
-            <span className="ud-search-icon">
-              <i className="bi bi-search"></i>
-            </span>
+            <span className="ud-search-icon"></span>
             <input
               className="form-control"
               type="search"
